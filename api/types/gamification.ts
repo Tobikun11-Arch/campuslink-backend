@@ -1,0 +1,5 @@
+export type ContributionAction =
+  | 'NOTE_APPROVED'
+  | 'LOST_ITEM_RETRIEVED'
+  | 'EVENT_PARTICIPATION'
+  | 'MARKETPLACE_SUCCESS';
