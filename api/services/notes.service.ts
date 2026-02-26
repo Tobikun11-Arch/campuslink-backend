@@ -1,6 +1,7 @@
 import { noteRepository } from '../repositories/note.repository';
 import { uploadToAppwrite } from './appwrite.service';
 import { validateFile } from '../utils/fileValidation';
+import { ApiError } from '../utils/errors';
 
 const allowedTypes = ['application/pdf'];
 const allowedExtensions = ['.pdf'];
@@ -32,5 +33,23 @@ export const notesService = {
       fileId: upload.fileId,
       fileUrl: upload.fileUrl
     });
+  },
+
+  async approve(noteId: string) {
+    const note = await noteRepository.findById(noteId);
+    if (!note) {
+      throw new ApiError(404, 'NOTE_NOT_FOUND', 'Note not found');
+    }
+
+    await noteRepository.updateStatus(noteId, 'APPROVED');
+  },
+
+  async reject(noteId: string, reason?: string) {
+    const note = await noteRepository.findById(noteId);
+    if (!note) {
+      throw new ApiError(404, 'NOTE_NOT_FOUND', 'Note not found');
+    }
+
+    await noteRepository.updateStatus(noteId, 'REJECTED', reason);
   }
 };

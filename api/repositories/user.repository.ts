@@ -3,7 +3,16 @@ import {UserModel, UserDocument} from '../models/User.model';
 export const userRepository = {
   findByEmail: (email: string) => UserModel.findOne({email}).exec(),
   findById: (id: string) => UserModel.findById(id).exec(),
+  listByIds: (ids: string[], options: { limit: number; skip: number }) =>
+    UserModel.find({_id: {$in: ids}})
+      .skip(options.skip)
+      .limit(options.limit)
+      .exec(),
   create: (data: Partial<UserDocument>) => UserModel.create(data),
+  updateProfile: (
+    userId: string,
+    data: Partial<Pick<UserDocument, 'course' | 'yearLevel' | 'bio' | 'interests'>>
+  ) => UserModel.updateOne({_id: userId}, data).exec(),
   updateVerification: (email: string, code?: string, expiry?: Date) =>
     UserModel.updateOne(
       {email},

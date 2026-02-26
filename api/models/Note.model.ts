@@ -8,6 +8,7 @@ export interface NoteDocument extends mongoose.Document {
   campus: string;
   authorId: Types.ObjectId;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  rejectionReason?: string;
   downloads: number;
   views: number;
 }
@@ -21,6 +22,7 @@ const NoteSchema = new Schema<NoteDocument>(
     campus: { type: String, required: true },
     authorId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     status: { type: String, default: 'PENDING' },
+    rejectionReason: { type: String },
     downloads: { type: Number, default: 0 },
     views: { type: Number, default: 0 }
   },

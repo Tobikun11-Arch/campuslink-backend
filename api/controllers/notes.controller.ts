@@ -23,5 +23,23 @@ export const notesController = {
     } catch (error) {
       next(error);
     }
+  },
+
+  async approve(req: Request, res: Response, next: NextFunction) {
+    try {
+      await notesService.approve(req.params.id);
+      res.status(200).json({ message: 'Approved' });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async reject(req: Request, res: Response, next: NextFunction) {
+    try {
+      await notesService.reject(req.params.id, req.body.reason);
+      res.status(200).json({ message: 'Rejected' });
+    } catch (error) {
+      next(error);
+    }
   }
 };

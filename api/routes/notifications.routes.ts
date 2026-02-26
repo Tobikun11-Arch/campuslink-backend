@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { notificationsController } from '../controllers/notifications.controller';
-import { authenticate } from '../middleware/auth';
+import { authenticate, requireRole } from '../middleware/auth';
 import { defaultLimiter } from '../middleware/rateLimit';
 
 const router = Router();
 
 router.get('/', authenticate, defaultLimiter, notificationsController.list);
+router.post('/', authenticate, requireRole(['OFFICER', 'PRESIDENT', 'ADMIN']), defaultLimiter, notificationsController.create);
 
 export default router;
