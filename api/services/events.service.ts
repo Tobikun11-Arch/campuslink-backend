@@ -1,4 +1,6 @@
-import { eventRepository } from '../repositories/event.repository';
+import {eventRepository} from '../repositories/event.repository';
+import {ApiError} from '../utils/errors';
+import {updateBadgeProgress} from '../utils/badgeUpdater';
 
 export const eventsService = {
   async list(query: {
@@ -31,10 +33,44 @@ export const eventsService = {
     const page = Number(query.page ?? 1);
     const skip = (page - 1) * limit;
 
-    return eventRepository.list(filter, { limit, skip, sort: { dateTime: 1 } });
+    return eventRepository.list(filter, {limit, skip, sort: {dateTime: 1}});
   },
 
   async create(data: any) {
     return eventRepository.create(data);
+  },
+
+  async rsvp(eventId: string, userId: string) {
+    const event = await eventRepository.findById(eventId);
+    if (!event) {
+      throw new ApiError(404, 'EVENT_NOT_FOUND', 'Event not found');
+    }
+
+    const alreadyJoined = (event.participants ?? []).some(
+      p => String(p) === userId
+    );
+    if (alreadyJoined) {
+      return;
+    }
+
+    if (event.capacity && event.attendingCount >= event.capacity) {
+      throw new ApiError(400, 'EVENT_FULL', 'Event is full');
+    }
+
+    const result = await eventRepository.addParticipant(eventId, userId);
+    if (result.matchedCount === 0) {
+      return;
+    }
+
+    await updateBadgeProgress(userId, 'EVENT_PARTICIPATION', eventId);
+  },
+
+  async unrsvp(eventId: string, userId: string) {
+    const event = await eventRepository.findById(eventId);
+    if (!event) {
+      throw new ApiError(404, 'EVENT_NOT_FOUND', 'Event not found');
+    }
+
+    await eventRepository.removeParticipant(eventId, userId);
   }
 };

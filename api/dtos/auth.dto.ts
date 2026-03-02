@@ -6,9 +6,7 @@ export const registerDto = z.object({
   email: z.string().email(),
   password: z.string().min(8),
   campus: z.string().min(1),
-  role: z.enum(['NORMAL', 'OFFICER', 'PRESIDENT']).optional(),
-  roleProofFileId: z.string().optional(),
-  roleProofUrl: z.string().url().optional()
+  role: z.enum(['NORMAL', 'OFFICER', 'PRESIDENT']).optional()
 });
 
 export const verifyDto = z.object({

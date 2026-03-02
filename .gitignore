@@ -5,6 +5,7 @@ context.md
 codex.plan.md
 API_CONTRACT.md
 CampusLink.postman_collection.json
+campuslink_end-to-end_api.md
 .env
 .env.*
-campuslink_end-to-end_api.md
+!campuslink_end-to-end_api.md

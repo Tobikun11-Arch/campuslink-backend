@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken';
 import {env} from '../config/env';
 import {userRepository} from '../repositories/user.repository';
 import {ApiError} from '../utils/errors';
+import {uploadToAppwrite} from './appwrite.service';
+import {validateFile} from '../utils/fileValidation';
 
 function generateVerificationCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -16,8 +18,7 @@ export const authService = {
     password: string;
     campus: string;
     role?: 'NORMAL' | 'OFFICER' | 'PRESIDENT' | 'ADMIN';
-    roleProofFileId?: string;
-    roleProofUrl?: string;
+    roleProof?: Express.Multer.File;
   }) {
     const existing = await userRepository.findByEmail(data.email);
     if (existing) {
@@ -28,15 +29,35 @@ export const authService = {
     const verificationCode = generateVerificationCode();
     const verificationExpiry = new Date(Date.now() + 15 * 60 * 1000);
 
+    const role = data.role ?? 'NORMAL';
+    const needsProof = role === 'OFFICER' || role === 'PRESIDENT';
+    const allowedTypes = ['image/jpeg', 'image/png'];
+    const allowedExtensions = ['.jpg', '.jpeg', '.png'];
+
+    let roleProofFileId: string | undefined;
+    let roleProofUrl: string | undefined;
+
+    if (needsProof) {
+      validateFile(
+        data.roleProof,
+        allowedTypes,
+        5 * 1024 * 1024,
+        allowedExtensions
+      );
+      const upload = await uploadToAppwrite(data.roleProof!);
+      roleProofFileId = upload.fileId;
+      roleProofUrl = upload.fileUrl;
+    }
+
     const user = await userRepository.create({
       firstName: data.firstName,
       lastName: data.lastName,
       email: data.email,
       passwordHash,
       campus: data.campus,
-      role: data.role ?? 'NORMAL',
-      roleProofFileId: data.roleProofFileId,
-      roleProofUrl: data.roleProofUrl,
+      role,
+      roleProofFileId,
+      roleProofUrl,
       verificationCode,
       verificationExpiry,
       isVerified: false

@@ -1,18 +1,18 @@
-import { noteRepository } from '../repositories/note.repository';
-import { uploadToAppwrite } from './appwrite.service';
-import { validateFile } from '../utils/fileValidation';
-import { ApiError } from '../utils/errors';
+import {noteRepository} from '../repositories/note.repository';
+import {uploadToAppwrite} from './appwrite.service';
+import {validateFile} from '../utils/fileValidation';
+import {ApiError} from '../utils/errors';
 
 const allowedTypes = ['application/pdf'];
 const allowedExtensions = ['.pdf'];
 
 export const notesService = {
-  async list(query: { limit?: string; page?: string }) {
+  async list(query: {limit?: string; page?: string}) {
     const limit = Number(query.limit ?? 20);
     const page = Number(query.page ?? 1);
     const skip = (page - 1) * limit;
 
-    return noteRepository.list({}, { limit, skip, sort: { createdAt: -1 } });
+    return noteRepository.list({}, {limit, skip, sort: {createdAt: -1}});
   },
 
   async create(data: {
@@ -51,5 +51,23 @@ export const notesService = {
     }
 
     await noteRepository.updateStatus(noteId, 'REJECTED', reason);
+  },
+
+  async trackView(noteId: string) {
+    const note = await noteRepository.findById(noteId);
+    if (!note) {
+      throw new ApiError(404, 'NOTE_NOT_FOUND', 'Note not found');
+    }
+
+    await noteRepository.incrementViews(noteId);
+  },
+
+  async trackDownload(noteId: string) {
+    const note = await noteRepository.findById(noteId);
+    if (!note) {
+      throw new ApiError(404, 'NOTE_NOT_FOUND', 'Note not found');
+    }
+
+    await noteRepository.incrementDownloads(noteId);
   }
 };
