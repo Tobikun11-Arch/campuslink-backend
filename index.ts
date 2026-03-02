@@ -30,13 +30,36 @@ app.get('/', async (req, res) => {
 
 app.use(errorHandler);
 
-connectDb()
-  .then(() => {
-    app.listen(env.PORT, () => {
-      console.log(`Server listening on port ${env.PORT}`);
-    });
-  })
-  .catch(error => {
+let dbInitPromise: Promise<unknown> | null = null;
+const ensureDb = () => {
+  if (!dbInitPromise) {
+    dbInitPromise = connectDb();
+  }
+  return dbInitPromise;
+};
+
+export default async function handler(
+  req: express.Request,
+  res: express.Response
+) {
+  try {
+    await ensureDb();
+    return app(req, res);
+  } catch (error) {
     console.error('Failed to connect to database', error);
-    process.exit(1);
-  });
+    return res.status(500).json({message: 'Database connection failed'});
+  }
+}
+
+if (process.env.VERCEL !== '1') {
+  ensureDb()
+    .then(() => {
+      app.listen(env.PORT, () => {
+        console.log(`Server listening on port ${env.PORT}`);
+      });
+    })
+    .catch(error => {
+      console.error('Failed to connect to database', error);
+      process.exit(1);
+    });
+}
