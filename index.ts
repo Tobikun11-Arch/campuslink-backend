@@ -1,11 +1,11 @@
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
-import {connectDb} from './config/db';
-import {env} from './config/env';
-import routes from './routes';
-import {errorHandler} from './middleware/errorHandler';
-import {sanitize} from './middleware/sanitize';
+import {connectDb} from './api/config/db';
+import {env} from './api/config/env';
+import routes from './api/routes';
+import {errorHandler} from './api/middleware/errorHandler';
+import {sanitize} from './api/middleware/sanitize';
 
 const app = express();
 
@@ -14,7 +14,7 @@ app.use(
   cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization']
   })
 );
 
@@ -26,8 +26,7 @@ app.use('/api', routes);
 //Delete after all prod finished-
 app.get('/', async (req, res) => {
   res.send('Hello production!');
-})
-
+});
 
 app.use(errorHandler);
 

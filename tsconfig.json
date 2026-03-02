@@ -5,10 +5,10 @@
     "moduleResolution": "node16",
     "strict": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,  
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "outDir": "./dist"
   },
-  "include": ["src/**/*.ts", "api/**/*.ts"],
+  "include": ["src/**/*.ts", "api/**/*.ts", "index.ts"],
   "exclude": ["node_modules"]
 }
