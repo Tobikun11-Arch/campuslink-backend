@@ -1,5 +1,5 @@
-import { redis } from './redis';
-import { NotificationPayload } from '../types/notification';
+import {redis} from './redis';
+import {NotificationPayload} from '../types/notification';
 
 const STREAM_KEY = 'notifications:stream';
 const DLQ_KEY = 'notifications:dlq';
