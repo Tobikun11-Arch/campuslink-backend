@@ -23,5 +23,18 @@ export const marketplaceController = {
     } catch (error) {
       next(error);
     }
+  },
+
+  async report(req: Request, res: Response, next: NextFunction) {
+    try {
+      await marketplaceService.report({
+        itemId: req.params.id,
+        reporterId: req.user!.userId,
+        reason: req.body.reason
+      });
+      res.status(200).json({ message: 'Reported' });
+    } catch (error) {
+      next(error);
+    }
   }
 };

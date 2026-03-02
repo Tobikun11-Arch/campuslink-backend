@@ -3,5 +3,5 @@ import { env } from './env';
 
 export async function connectDb() {
   mongoose.set('strictQuery', true);
-  await mongoose.connect(env.MONGO_URL);
+  await mongoose.connect(env.MONGO_URI);
 }

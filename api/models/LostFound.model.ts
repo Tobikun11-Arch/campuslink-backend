@@ -6,6 +6,7 @@ export interface LostFoundDocument extends mongoose.Document {
   photoUrl?: string;
   description: string;
   location: string;
+  campus: string;
   finderId: Types.ObjectId;
   status: 'ACTIVE' | 'RETRIEVED';
   retrievedBy?: Types.ObjectId;
@@ -20,6 +21,7 @@ const LostFoundSchema = new Schema<LostFoundDocument>(
     photoUrl: { type: String },
     description: { type: String, required: true },
     location: { type: String, required: true },
+    campus: { type: String, required: true },
     finderId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     status: { type: String, default: 'ACTIVE' },
     retrievedBy: { type: Schema.Types.ObjectId, ref: 'User' },

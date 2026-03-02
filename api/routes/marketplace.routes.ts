@@ -9,5 +9,6 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 router.get('/', authenticate, uploadLimiter, marketplaceController.list);
 router.post('/', authenticate, uploadLimiter, upload.array('images', 5), marketplaceController.create);
+router.post('/:id/report', authenticate, uploadLimiter, marketplaceController.report);
 
 export default router;

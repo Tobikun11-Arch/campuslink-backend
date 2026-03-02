@@ -1,10 +1,13 @@
-import { Request, Response, NextFunction } from 'express';
-import { authService } from '../services/auth.service';
+import {Request, Response, NextFunction} from 'express';
+import {authService} from '../services/auth.service';
 
 export const authController = {
   async register(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await authService.register(req.body);
+      const result = await authService.register({
+        ...req.body,
+        roleProof: req.file
+      });
       res.status(201).json(result);
     } catch (error) {
       next(error);
@@ -14,7 +17,7 @@ export const authController = {
   async verify(req: Request, res: Response, next: NextFunction) {
     try {
       await authService.verify(req.body.email, req.body.code);
-      res.status(200).json({ message: 'Verified' });
+      res.status(200).json({message: 'Verified'});
     } catch (error) {
       next(error);
     }
