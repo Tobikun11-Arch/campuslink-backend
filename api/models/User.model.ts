@@ -8,6 +8,8 @@ export interface UserDocument extends mongoose.Document {
   campus: string;
   course?: string;
   yearLevel?: string;
+  bio?: string;
+  interests?: string[];
   role: 'NORMAL' | 'OFFICER' | 'PRESIDENT' | 'ADMIN';
   roleProofFileId?: string;
   roleProofUrl?: string;
@@ -33,6 +35,8 @@ const UserSchema = new Schema<UserDocument>(
     campus: { type: String, required: true },
     course: { type: String },
     yearLevel: { type: String },
+    bio: { type: String, default: '' },
+    interests: [{ type: String }],
     role: { type: String, default: 'NORMAL' },
     roleProofFileId: { type: String },
     roleProofUrl: { type: String },

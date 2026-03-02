@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
-import { adminService } from '../services/admin.service';
+import {Request, Response, NextFunction} from 'express';
+import {adminService} from '../services/admin.service';
 
 export const adminController = {
   async pendingRoles(_req: Request, res: Response, next: NextFunction) {
@@ -14,7 +14,7 @@ export const adminController = {
   async approveRole(req: Request, res: Response, next: NextFunction) {
     try {
       await adminService.approveRole(req.user!.userId, req.params.userId);
-      res.status(200).json({ message: 'Role approved' });
+      res.status(200).json({message: 'Role approved'});
     } catch (error) {
       next(error);
     }
@@ -23,7 +23,7 @@ export const adminController = {
   async rejectRole(req: Request, res: Response, next: NextFunction) {
     try {
       await adminService.rejectRole(req.user!.userId, req.params.userId);
-      res.status(200).json({ message: 'Role rejected' });
+      res.status(200).json({message: 'Role rejected'});
     } catch (error) {
       next(error);
     }
@@ -41,7 +41,7 @@ export const adminController = {
   async resolveReport(req: Request, res: Response, next: NextFunction) {
     try {
       await adminService.resolveReport(req.user!.userId, req.params.reportId);
-      res.status(200).json({ message: 'Report resolved' });
+      res.status(200).json({message: 'Report resolved'});
     } catch (error) {
       next(error);
     }

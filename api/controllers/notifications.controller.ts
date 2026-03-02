@@ -1,14 +1,56 @@
-import { Request, Response, NextFunction } from 'express';
-import { NotificationModel } from '../models/Notification.model';
+import {Request, Response, NextFunction} from 'express';
+import {NotificationModel} from '../models/Notification.model';
+import {notificationService} from '../services/notification.service';
+import {ApiError} from '../utils/errors';
 
 export const notificationsController = {
   async list(req: Request, res: Response, next: NextFunction) {
     try {
-      const notifications = await NotificationModel.find({ recipientIds: req.user!.userId })
-        .sort({ timestamp: -1 })
+      const notifications = await NotificationModel.find({
+        recipientIds: req.user!.userId
+      })
+        .sort({timestamp: -1})
         .limit(50)
         .exec();
       res.status(200).json(notifications);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      await notificationService.createNotification({
+        type: req.body.type,
+        targetAudience: req.body.targetAudience,
+        delivery: req.body.delivery,
+        senderId: req.user!.userId,
+        recipientIds: req.body.recipientIds ?? [],
+        title: req.body.title,
+        body: req.body.body
+      });
+      res.status(201).json({message: 'Notification queued'});
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async markAsRead(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await NotificationModel.updateOne(
+        {_id: req.params.id, recipientIds: req.user!.userId},
+        {isRead: true}
+      ).exec();
+
+      if (result.matchedCount === 0) {
+        throw new ApiError(
+          404,
+          'NOTIFICATION_NOT_FOUND',
+          'Notification not found'
+        );
+      }
+
+      res.status(200).json({message: 'Marked as read'});
     } catch (error) {
       next(error);
     }
