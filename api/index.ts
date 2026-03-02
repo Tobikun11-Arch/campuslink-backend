@@ -24,6 +24,12 @@ app.use(sanitize);
 
 app.use('/api', routes);
 
+//Delete after all prod finished-
+app.get('/', async (req, res) => {
+  res.send('Hello production!');
+})
+
+
 app.use(errorHandler);
 
 connectDb()
