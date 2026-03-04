@@ -5,9 +5,15 @@ import {userRepository} from '../repositories/user.repository';
 import {ApiError} from '../utils/errors';
 import {uploadToAppwrite} from './appwrite.service';
 import {validateFile} from '../utils/fileValidation';
+import {emailService} from './email.service';
+import {verificationCodeEmailTemplate} from '../templates/verificationCodeEmail';
 
 function generateVerificationCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+function getVerificationExpiry(minutes: number) {
+  return new Date(Date.now() + minutes * 60 * 1000);
 }
 
 export const authService = {
@@ -27,7 +33,7 @@ export const authService = {
 
     const passwordHash = await bcrypt.hash(data.password, 10);
     const verificationCode = generateVerificationCode();
-    const verificationExpiry = new Date(Date.now() + 15 * 60 * 1000);
+    const verificationExpiry = getVerificationExpiry(15);
 
     const role = data.role ?? 'NORMAL';
     const needsProof = role === 'OFFICER' || role === 'PRESIDENT';
@@ -63,7 +69,20 @@ export const authService = {
       isVerified: false
     });
 
-    return {id: user.id, email: user.email, verificationCode};
+    const emailTpl = verificationCodeEmailTemplate({
+      code: verificationCode,
+      expiresMinutes: 15,
+      recipientName: data.firstName
+    });
+
+    await emailService.sendEmail({
+      to: data.email,
+      subject: emailTpl.subject,
+      text: emailTpl.text,
+      html: emailTpl.html
+    });
+
+    return {id: user.id, email: user.email};
   },
 
   async verify(email: string, code: string) {
@@ -84,6 +103,38 @@ export const authService = {
     }
 
     await userRepository.markVerified(email);
+  },
+
+  async resendVerification(email: string) {
+    const user = await userRepository.findByEmail(email);
+    if (!user) {
+      throw new ApiError(404, 'USER_NOT_FOUND', 'User not found');
+    }
+
+    if (user.isVerified) {
+      throw new ApiError(400, 'ALREADY_VERIFIED', 'Email already verified');
+    }
+
+    const verificationCode = generateVerificationCode();
+    const verificationExpiry = getVerificationExpiry(15);
+    await userRepository.updateVerification(
+      email,
+      verificationCode,
+      verificationExpiry
+    );
+
+    const emailTpl = verificationCodeEmailTemplate({
+      code: verificationCode,
+      expiresMinutes: 15,
+      recipientName: user.firstName
+    });
+
+    await emailService.sendEmail({
+      to: email,
+      subject: emailTpl.subject,
+      text: emailTpl.text,
+      html: emailTpl.html
+    });
   },
 
   async login(email: string, password: string) {

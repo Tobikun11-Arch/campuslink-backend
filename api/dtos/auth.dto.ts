@@ -14,6 +14,10 @@ export const verifyDto = z.object({
   code: z.string().min(4)
 });
 
+export const resendVerificationDto = z.object({
+  email: z.string().email()
+});
+
 export const loginDto = z.object({
   email: z.string().email(),
   password: z.string().min(8)
@@ -22,3 +26,4 @@ export const loginDto = z.object({
 export type RegisterDto = z.infer<typeof registerDto>;
 export type VerifyDto = z.infer<typeof verifyDto>;
 export type LoginDto = z.infer<typeof loginDto>;
+export type ResendVerificationDto = z.infer<typeof resendVerificationDto>;

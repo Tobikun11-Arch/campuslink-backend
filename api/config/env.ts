@@ -14,7 +14,12 @@ const envSchema = z.object({
   APPWRITE_API_KEY: z.string().min(1),
   APPWRITE_BUCKET_ID: z.string().min(1),
   REDIS_URL: z.string().min(1),
-  FCM_KEY: z.string().min(1)
+  FCM_KEY: z.string().min(1),
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.string().optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  SMTP_FROM: z.string().optional()
 });
 
 const parsed = envSchema.safeParse(process.env);

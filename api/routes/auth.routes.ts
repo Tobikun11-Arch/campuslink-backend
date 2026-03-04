@@ -2,7 +2,12 @@ import {Router} from 'express';
 import multer from 'multer';
 import {authController} from '../controllers/auth.controller';
 import {validate} from '../middleware/validation';
-import {registerDto, verifyDto, loginDto} from '../dtos/auth.dto';
+import {
+  registerDto,
+  resendVerificationDto,
+  verifyDto,
+  loginDto
+} from '../dtos/auth.dto';
 import {authLimiter} from '../middleware/rateLimit';
 
 const router = Router();
@@ -16,6 +21,12 @@ router.post(
   authController.register
 );
 router.post('/verify', authLimiter, validate(verifyDto), authController.verify);
+router.post(
+  '/resend-verification',
+  authLimiter,
+  validate(resendVerificationDto),
+  authController.resendVerification
+);
 router.post('/login', authLimiter, validate(loginDto), authController.login);
 
 export default router;
