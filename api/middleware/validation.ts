@@ -1,13 +1,22 @@
-import { AnyZodObject } from 'zod';
-import { Request, Response, NextFunction } from 'express';
-import { ApiError } from '../utils/errors';
+import {AnyZodObject} from 'zod';
+import {Request, Response, NextFunction} from 'express';
+import {ApiError} from '../utils/errors';
 
-export const validate = (schema: AnyZodObject) => (req: Request, _res: Response, next: NextFunction) => {
-  const result = schema.safeParse(req.body);
+export const validate =
+  (schema: AnyZodObject) =>
+  (req: Request, _res: Response, next: NextFunction) => {
+    const result = schema.safeParse(req.body);
 
-  if (!result.success) {
-    return next(new ApiError(400, 'VALIDATION_ERROR', 'Invalid request', result.error.flatten()));
-  }
+    if (!result.success) {
+      const flattened = result.error.flatten();
+      const firstFieldError = Object.values(flattened.fieldErrors)
+        .flat()
+        .filter(Boolean)[0];
+      const firstFormError = flattened.formErrors.filter(Boolean)[0];
+      const message = firstFieldError ?? firstFormError ?? 'Invalid request';
 
-  next();
-};
+      return next(new ApiError(400, 'VALIDATION_ERROR', message, flattened));
+    }
+
+    next();
+  };
