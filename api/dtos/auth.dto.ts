@@ -1,25 +1,32 @@
 import {z} from 'zod';
 
+const cvsuEmail = z
+  .string()
+  .email()
+  .refine(v => v.toLowerCase().endsWith('@cvsu.edu.ph'), {
+    message: 'Email must be a @cvsu.edu.ph address'
+  });
+
 export const registerDto = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),
-  email: z.string().email(),
+  email: cvsuEmail,
   password: z.string().min(8),
   campus: z.string().min(1),
   role: z.enum(['NORMAL', 'OFFICER', 'PRESIDENT']).optional()
 });
 
 export const verifyDto = z.object({
-  email: z.string().email(),
+  email: cvsuEmail,
   code: z.string().min(4)
 });
 
 export const resendVerificationDto = z.object({
-  email: z.string().email()
+  email: cvsuEmail
 });
 
 export const loginDto = z.object({
-  email: z.string().email(),
+  email: cvsuEmail,
   password: z.string().min(8)
 });
 
