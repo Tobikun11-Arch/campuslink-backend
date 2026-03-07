@@ -170,5 +170,31 @@ export const authService = {
     });
 
     return {accessToken, refreshToken};
+  },
+  async refreshAccessToken(refreshToken: string) {
+    try {
+      const payload = jwt.verify(refreshToken, env.JWT_REFRESH_SECRET) as {
+        userId: string;
+      };
+
+      const user = await userRepository.findById(payload.userId);
+      if (!user) {
+        throw new ApiError(401, 'UNAUTHORIZED', 'Invalid token');
+      }
+
+      if (!user.isVerified) {
+        throw new ApiError(403, 'NOT_VERIFIED', 'Email not verified');
+      }
+
+      const accessToken = jwt.sign(
+        {userId: user.id, role: user.role},
+        env.JWT_SECRET,
+        {expiresIn: '15m'}
+      );
+
+      return {accessToken};
+    } catch {
+      throw new ApiError(401, 'UNAUTHORIZED', 'Invalid token');
+    }
   }
 };

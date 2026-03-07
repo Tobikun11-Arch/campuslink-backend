@@ -30,7 +30,12 @@ export const loginDto = z.object({
   password: z.string().min(8)
 });
 
+export const refreshDto = z.object({
+  refreshToken: z.string().min(1)
+});
+
 export type RegisterDto = z.infer<typeof registerDto>;
 export type VerifyDto = z.infer<typeof verifyDto>;
 export type LoginDto = z.infer<typeof loginDto>;
 export type ResendVerificationDto = z.infer<typeof resendVerificationDto>;
+export type RefreshDto = z.infer<typeof refreshDto>;

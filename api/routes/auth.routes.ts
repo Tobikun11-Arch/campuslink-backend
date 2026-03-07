@@ -6,7 +6,8 @@ import {
   registerDto,
   resendVerificationDto,
   verifyDto,
-  loginDto
+  loginDto,
+  refreshDto
 } from '../dtos/auth.dto';
 import {authLimiter} from '../middleware/rateLimit';
 
@@ -28,5 +29,11 @@ router.post(
   authController.resendVerification
 );
 router.post('/login', authLimiter, validate(loginDto), authController.login);
+router.post(
+  '/refresh',
+  authLimiter,
+  validate(refreshDto),
+  authController.refresh
+);
 
 export default router;

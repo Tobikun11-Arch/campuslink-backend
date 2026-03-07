@@ -1,5 +1,5 @@
-import { ApiError } from '../utils/errors';
-import { userRepository } from '../repositories/user.repository';
+import {ApiError} from '../utils/errors';
+import {userRepository} from '../repositories/user.repository';
 
 export const profileService = {
   async getMe(userId: string) {
@@ -28,7 +28,12 @@ export const profileService = {
 
   async updateMe(
     userId: string,
-    data: { course?: string; yearLevel?: string; bio?: string; interests?: string[] }
+    data: {
+      course?: string;
+      yearLevel?: string;
+      bio?: string;
+      interests?: string[];
+    }
   ) {
     const user = await userRepository.findById(userId);
     if (!user) {
@@ -43,7 +48,7 @@ export const profileService = {
     });
   },
 
-  async listFollowers(userId: string, query: { limit?: string; page?: string }) {
+  async listFollowers(userId: string, query: {limit?: string; page?: string}) {
     const user = await userRepository.findById(userId);
     if (!user) {
       throw new ApiError(404, 'USER_NOT_FOUND', 'User not found');
@@ -54,11 +59,11 @@ export const profileService = {
     const skip = (page - 1) * limit;
 
     const followers = await userRepository.listByIds(
-      (user.followers ?? []).map((id) => String(id)),
-      { limit, skip }
+      (user.followers ?? []).map(id => String(id)),
+      {limit, skip}
     );
 
-    return followers.map((follower) => ({
+    return followers.map(follower => ({
       id: String(follower._id),
       firstName: follower.firstName,
       lastName: follower.lastName,
@@ -73,7 +78,7 @@ export const profileService = {
     }));
   },
 
-  async listFollowing(userId: string, query: { limit?: string; page?: string }) {
+  async listFollowing(userId: string, query: {limit?: string; page?: string}) {
     const user = await userRepository.findById(userId);
     if (!user) {
       throw new ApiError(404, 'USER_NOT_FOUND', 'User not found');
@@ -84,11 +89,11 @@ export const profileService = {
     const skip = (page - 1) * limit;
 
     const following = await userRepository.listByIds(
-      (user.following ?? []).map((id) => String(id)),
-      { limit, skip }
+      (user.following ?? []).map(id => String(id)),
+      {limit, skip}
     );
 
-    return following.map((followed) => ({
+    return following.map(followed => ({
       id: String(followed._id),
       firstName: followed.firstName,
       lastName: followed.lastName,
