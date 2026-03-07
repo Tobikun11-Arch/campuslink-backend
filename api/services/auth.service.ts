@@ -163,7 +163,7 @@ export const authService = {
     const accessToken = jwt.sign(
       {userId: user.id, role: user.role},
       env.JWT_SECRET,
-      {expiresIn: '15m'}
+      {expiresIn: '1m'}
     );
     const refreshToken = jwt.sign({userId: user.id}, env.JWT_REFRESH_SECRET, {
       expiresIn: '7d'
